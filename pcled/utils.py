@@ -15,13 +15,18 @@ def check_stream(ser):
     return int.from_bytes(ser.read(), byteorder='little') == 1
 
 
-def execute(func, delay=0.0, clock=10, COM='COM3', PORT=9600, **kwargs):
+def correct_intensity(val, maxBrightness=155):
+    return (maxBrightness*v/255. for v in val)
+
+
+def execute(func, delay=0.0, clock=10, maxBrightness=155, COM='COM3',
+            PORT=9600, **kwargs):
     with serial.Serial(COM, PORT) as ser:
         if check_stream(ser):
             ser.write(b'%dc' % clock)
         while True:
             if check_stream(ser):
-                r, g, b = func(**kwargs)
+                r, g, b = correct_intensity(func(**kwargs), maxBrightness)
                 ser.write(b'%dr%dg%db' % (r, g, b))
                 if delay > 0.0:
                     time.sleep(delay)
@@ -45,6 +50,9 @@ def get_args():
     parser.add_argument('-c', '--pixel-clock', dest='clock',
                         help='Pixel clock (milliseconds)',
                         default=10, type=int)
+    parser.add_argument('-b', '--max-brightness', dest='maxBrightness',
+                        help='Maximum brightness (0-255)',
+                        default=155, type=int)
     parser.add_argument('-i', '--gpu-index', dest='deviceID',
                         help='Nvidia device index.', default=None, type=int)
     parser.add_argument('-m', '--color-map', dest='cmap',
