@@ -67,7 +67,7 @@ setup(
              'requirements.txt'],
     },
     zip_safe=True,
-    scripts=glob('./scripts/*.py'),
+    scripts=glob('./scripts/python/*.py'),
     install_requires=readlist('requirements.txt'),
     **extra
 )
