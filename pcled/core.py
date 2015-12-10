@@ -22,11 +22,13 @@ except:
     ImageGrab = None
 
 __modules__ = [
-                'gpu_temp',
-                'cpu_usage',
-                'screen_glow',
-                'random_glow'
-                ]
+    'gpu_temp',
+    'cpu_usage',
+    'screen_glow',
+    'random_glow',
+    'color_wheel',
+    'random_glow'
+    ]
 
 
 def gpu_temp(handle=None, deviceID=0, cmap='cool', **kwargs):
@@ -47,3 +49,7 @@ def screen_glow(**kwargs):
 
 def random_glow(**kwargs):
     return np.random.randint(0, 255, 3)
+
+
+def color_wheel(cmap='cool', i=0, **kwargs):
+    return plt.get_cmap(cmap)(i/10., bytes=True)[:3]

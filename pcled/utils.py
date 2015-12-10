@@ -21,15 +21,17 @@ def correct_intensity(val, maxBrightness=155):
 
 def execute(func, delay=0.0, clock=10, maxBrightness=155, COM='COM3',
             PORT=9600, **kwargs):
+    i = 0
     with serial.Serial(COM, PORT) as ser:
         if check_stream(ser):
             ser.write(b'%dc' % clock)
         while True:
             if check_stream(ser):
-                r, g, b = correct_intensity(func(**kwargs), maxBrightness)
+                r, g, b = correct_intensity(func(i=i, **kwargs), maxBrightness)
                 ser.write(b'%dr%dg%db' % (r, g, b))
                 if delay > 0.0:
                     time.sleep(delay)
+                i = (i + 1) % 11
 
 
 def get_args():
