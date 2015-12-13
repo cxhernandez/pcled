@@ -71,8 +71,7 @@ void loop() {
       }
       tmsg = millis();
     }
-
-    if (lag > maxlag && lag > 0) {
+    if (lag < maxlag && lag > 0) {
       strip.setPixelColor(j, C);
       strip.show();
       delay(wait);
