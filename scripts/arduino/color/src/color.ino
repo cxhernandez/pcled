@@ -68,8 +68,8 @@ void loop() {
           wait = msg.toInt();
           Serial.write(1);
         }
+        tmsg = millis();
       }
-      tmsg = millis();
     }
     if (lag < maxlag && lag > 0) {
       strip.setPixelColor(j, C);
