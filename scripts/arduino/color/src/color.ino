@@ -43,12 +43,13 @@ void setup() {
   Serial.begin(PORT);
   Serial.write(1);
 
-  tmsg=millis();
+  tmsg = millis();
 }
 
 void loop() {
   step = step % NUM;
   exec(step);
+  lag = millis() - tmsg;
   step++;
   }
 
@@ -66,11 +67,11 @@ void loop() {
         } else if (code == 3) {
           wait = msg.toInt();
           Serial.write(1);
-          tmsg = millis();
         }
       }
+      tmsg = millis();
     }
-    lag = millis() - tmsg;
+
     if (lag > maxlag && lag > 0) {
       strip.setPixelColor(j, C);
       strip.show();
