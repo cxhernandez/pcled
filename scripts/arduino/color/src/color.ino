@@ -16,11 +16,16 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM, PIN, NEO_GRB + NEO_KHZ800);
 
-int j;
-int wait = 10;
+unsigned int step;
+unsigned long tmsg;
+unsigned long lag;
 String msg;
 
-int RGB[3] = {0, 0, 150}; // Default color: Blue
+unsigned long maxlag = 1000;
+unsigned int wait = 10;
+
+
+unsigned int RGB[3] = {0, 0, 150}; // Default color: Blue
 uint32_t C = strip.Color(RGB[0], RGB[1], RGB[2]);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
@@ -29,7 +34,7 @@ uint32_t C = strip.Color(RGB[0], RGB[1], RGB[2]);
 // on a live circuit...if you must, connect GND first.
 
 void setup() {
-  j = 0;
+  step = 0;
   msg = "";
 
   strip.begin();
@@ -37,12 +42,14 @@ void setup() {
 
   Serial.begin(PORT);
   Serial.write(1);
+
+  tmsg=millis();
 }
 
 void loop() {
-  j = j % NUM;
-  exec(j);
-  j++;
+  step = step % NUM;
+  exec(step);
+  step++;
   }
 
   void exec(int j) {
@@ -59,13 +66,19 @@ void loop() {
         } else if (code == 3) {
           wait = msg.toInt();
           Serial.write(1);
+          tmsg = millis();
         }
       }
     }
-    strip.setPixelColor(j, C);
-    strip.show();
-    delay(wait);
-  }
+    lag = millis() - tmsg;
+    if (lag < maxlag && lag > 0) {
+      strip.setPixelColor(j, C);
+      strip.show();
+      delay(wait);
+    } else {
+      rainbow(wait);
+    }
+}
 
   int getCode(char ch) {
     if (ch == 'r') {
@@ -91,3 +104,28 @@ void loop() {
         Serial.write(1);
       }
   }
+
+  uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+   return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  } else if(WheelPos < 170) {
+    WheelPos -= 85;
+   return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  } else {
+   WheelPos -= 170;
+   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  }
+}
+
+  void rainbow(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256; j++) {
+    for(i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel((i+j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
