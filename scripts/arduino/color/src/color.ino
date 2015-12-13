@@ -21,7 +21,7 @@ unsigned long tmsg;
 unsigned long lag;
 String msg;
 
-unsigned long maxlag = 1000;
+unsigned long maxlag = 10000;
 unsigned int wait = 10;
 
 
